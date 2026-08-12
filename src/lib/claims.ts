@@ -165,3 +165,35 @@ function isUniqueConstraintError(e: unknown): boolean {
     (e as Prisma.PrismaClientKnownRequestError).code === "P2002"
   );
 }
+
+export const claimDetailInclude = {
+  submitter: true,
+  approvals: { orderBy: { stageIndex: "asc" } },
+} satisfies Prisma.ExpenseClaimInclude;
+
+type ClaimWithDetail = Prisma.ExpenseClaimGetPayload<{ include: typeof claimDetailInclude }>;
+
+/**
+ * The one place that turns a Prisma claim row into API/UI-facing JSON.
+ * Always routes status through getClaimStatus() rather than recomputing it.
+ */
+export function toClaimView(claim: ClaimWithDetail) {
+  return {
+    id: claim.id,
+    submitter: { id: claim.submitter.id, name: claim.submitter.name },
+    amount: Number(claim.amount),
+    description: claim.description,
+    chain: JSON.parse(claim.chain) as string[],
+    createdAt: claim.createdAt,
+    resubmittedFrom: claim.resubmittedFrom,
+    status: getClaimStatus(claim),
+    approvals: claim.approvals.map((a) => ({
+      stageIndex: a.stageIndex,
+      actorName: a.actorName,
+      actorRole: a.actorRole,
+      decision: a.decision,
+      comment: a.comment,
+      createdAt: a.createdAt,
+    })),
+  };
+}
