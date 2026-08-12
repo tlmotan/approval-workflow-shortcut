@@ -173,6 +173,8 @@ export const claimDetailInclude = {
 
 type ClaimWithDetail = Prisma.ExpenseClaimGetPayload<{ include: typeof claimDetailInclude }>;
 
+export type ClaimView = ReturnType<typeof toClaimView>;
+
 /**
  * The one place that turns a Prisma claim row into API/UI-facing JSON.
  * Always routes status through getClaimStatus() rather than recomputing it.
