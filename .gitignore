@@ -42,6 +42,8 @@ next-env.d.ts
 # claude code local settings
 .claude/
 
-# sqlite dev database
+# sqlite databases
 /prisma/dev.db
 /prisma/dev.db-journal
+/prisma/test.db
+/prisma/test.db-journal
