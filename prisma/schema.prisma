@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id   String @id @default(cuid())
+  name String
+  role String // "Manager" | "Finance" | "Director" | "Employee"
+
+  claimsSubmitted ExpenseClaim[]
+  approvals       ApprovalRecord[]
+}
+
+model ExpenseClaim {
+  id              String   @id @default(cuid())
+  submitterId     String
+  submitter       Employee @relation(fields: [submitterId], references: [id])
+  amount          Decimal
+  description     String
+  chain           String // JSON array of role strings, e.g. ["Manager","Finance"], locked at creation
+  createdAt       DateTime @default(now())
+  resubmittedFrom String? // optional FK to a prior rejected ExpenseClaim.id
+
+  approvals ApprovalRecord[]
+}
+
+model ApprovalRecord {
+  id         String       @id @default(cuid())
+  claimId    String
+  claim      ExpenseClaim @relation(fields: [claimId], references: [id])
+  stageIndex Int
+  actorId    String
+  actor      Employee     @relation(fields: [actorId], references: [id])
+  actorName  String // denormalized snapshot of actor.name at time of decision
+  actorRole  String // denormalized snapshot of actor.role at time of decision
+  decision   String // "approved" | "rejected"
+  comment    String?
+  createdAt  DateTime     @default(now())
+
+  @@unique([claimId, stageIndex]) // enforces: only one decision per stage, ever — DB-level guard against race conditions
+}
