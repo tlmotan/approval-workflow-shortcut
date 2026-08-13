@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { claimDetailInclude, toClaimView } from "@/lib/claims";
@@ -12,14 +13,9 @@ type Filter = (typeof FILTERS)[number];
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    resubmitFrom?: string;
-    description?: string;
-    submit?: string;
-    status?: string;
-  }>;
+  searchParams: Promise<{ status?: string }>;
 }) {
-  const { resubmitFrom, description, submit, status } = await searchParams;
+  const { status } = await searchParams;
   const filter: Filter = FILTERS.includes(status as Filter) ? (status as Filter) : "all";
 
   const [employees, claims] = await Promise.all([
@@ -127,12 +123,9 @@ export default async function HomePage({
         </div>
       </main>
 
-      <SubmitClaimLauncher
-        employees={employees}
-        initialOpen={submit === "1" || Boolean(resubmitFrom)}
-        resubmittedFrom={resubmitFrom}
-        defaultDescription={description}
-      />
+      <Suspense fallback={null}>
+        <SubmitClaimLauncher employees={employees} />
+      </Suspense>
     </>
   );
 }
