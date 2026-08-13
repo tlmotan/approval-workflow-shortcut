@@ -14,12 +14,16 @@ export function describeStatus(status: ClaimStatus, chain: string[]): string {
 export function statusColorClasses(status: ClaimStatus): string {
   switch (status.kind) {
     case "Approved":
-      return "bg-emerald-50 text-emerald-700 ring-emerald-600/20";
+      return "bg-emerald-100 text-emerald-700";
     case "Rejected":
-      return "bg-red-50 text-red-700 ring-red-600/20";
+      return "bg-red-100 text-red-700";
     case "Pending":
-      return "bg-amber-50 text-amber-700 ring-amber-600/20";
+      return "bg-amber-100 text-amber-700";
   }
+}
+
+export function statusLabel(status: ClaimStatus): string {
+  return status.kind;
 }
 
 export function formatMYR(amount: number): string {
@@ -35,4 +39,9 @@ export function formatDateTime(date: Date | string): string {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(d);
+}
+
+/** Compact, human-scannable reference for a claim's cuid — display only, not a stored field. */
+export function shortId(id: string): string {
+  return `#${id.slice(0, 8).toUpperCase()}`;
 }
