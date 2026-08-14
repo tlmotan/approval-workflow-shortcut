@@ -11,6 +11,11 @@ export function TopBar({ employees }: { employees: Employee[] }) {
   const stored = useStoredActorId();
   const [manualId, setManualId] = useState<string | null>(null);
 
+  // defaultId is recomputed every render from the live localStorage snapshot,
+  // not captured once via useState(defaultId) — a plain useState would freeze
+  // the default at whatever it was on first mount, the same stale-snapshot
+  // bug fixed in SubmitClaimLauncher. manualId only exists to let an explicit
+  // in-session pick override that live default without fighting it.
   const defaultId =
     stored && employees.some((e) => e.id === stored) ? stored : (employees[0]?.id ?? "");
   const actorId = manualId ?? defaultId;

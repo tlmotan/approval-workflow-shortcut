@@ -3,6 +3,14 @@ import { formatDateTime } from "@/lib/format";
 
 type StageState = "done" | "current" | "rejected" | "upcoming";
 
+/**
+ * Display-only derivation, separate from getClaimStatus(). A Rejected claim
+ * still marks every stage before rejectedAtStage as "done" (checkmarked),
+ * not grayed out — those stages were genuinely approved before the
+ * rejection happened, and the UI should reflect that real history rather
+ * than treating the whole chain as failed. Only the stage that was actually
+ * rejected gets the "rejected" (X) state.
+ */
 function getStageStates(chain: string[], status: ClaimStatus): StageState[] {
   if (status.kind === "Approved") return chain.map(() => "done");
   if (status.kind === "Rejected") {

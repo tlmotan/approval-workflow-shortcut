@@ -123,6 +123,12 @@ describe("required scenarios", () => {
     const claim = await submit(300);
     const manager = await employeeByRole(client, "Manager");
 
+    // Both act() calls start before either finishes its in-memory
+    // "already decided?" check, so both pass it and both attempt the
+    // INSERT — this is a genuine race at the database, not a simulated
+    // one, even though it's driven from a single process. The
+    // @@unique([claimId, stageIndex]) constraint, not this test's timing,
+    // is what guarantees only one write survives.
     const [first, second] = await Promise.allSettled([
       act(claim.id, manager.id, "approved", undefined, client),
       act(claim.id, manager.id, "approved", undefined, client),

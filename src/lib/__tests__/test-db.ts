@@ -16,6 +16,9 @@ export const SEED_EMPLOYEES = [
 ] as const;
 
 export async function resetDb(client: PrismaClient) {
+  // Delete order matters: approvalRecord references expenseClaim references
+  // employee, and SQLite enforces those foreign keys — deleting a parent
+  // before its children would fail.
   await client.approvalRecord.deleteMany();
   await client.expenseClaim.deleteMany();
   await client.employee.deleteMany();
