@@ -3,6 +3,13 @@ import { formatDateTime } from "@/lib/format";
 
 type StageState = "done" | "current" | "rejected" | "upcoming";
 
+/**
+ * On a Rejected claim, stages before rejectedAtStage are still marked "done"
+ * rather than graying out the whole chain — those approvals genuinely
+ * happened and are part of the audit trail, even though the claim as a
+ * whole didn't survive. Only the stage that rejected gets the "rejected"
+ * marker; everything after it is "upcoming" because it was never reached.
+ */
 function getStageStates(chain: string[], status: ClaimStatus): StageState[] {
   if (status.kind === "Approved") return chain.map(() => "done");
   if (status.kind === "Rejected") {

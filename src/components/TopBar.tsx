@@ -13,6 +13,13 @@ export function TopBar({ employees }: { employees: Employee[] }) {
 
   const defaultId =
     stored && employees.some((e) => e.id === stored) ? stored : (employees[0]?.id ?? "");
+  // manualId ?? defaultId, not useState(defaultId): defaultId depends on
+  // localStorage (via useStoredActorId), which resolves after the first
+  // render. Seeding useState with defaultId would snapshot "" (or the wrong
+  // employee) at mount and never pick up the real value once it loads.
+  // Deriving on every render means the dropdown reflects localStorage
+  // immediately, and manualId only overrides it once the user actually picks
+  // something.
   const actorId = manualId ?? defaultId;
   const actor = employees.find((e) => e.id === actorId);
 

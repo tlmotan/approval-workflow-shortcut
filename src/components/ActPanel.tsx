@@ -23,6 +23,12 @@ export function ActPanel({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState<"approved" | "rejected" | null>(null);
 
+  // Same manualId ?? defaultId derivation as TopBar (see its comment) so the
+  // dropdown picks up localStorage without a snapshot-at-mount bug. The
+  // fallback chain also prefers an approver whose role matches this stage
+  // over just employees[0] — a convenience default only, since act() still
+  // rejects the request server-side if the eventually-selected actor's role
+  // doesn't match requiredRole.
   const defaultId =
     (stored && approvers.some((a) => a.id === stored) ? stored : undefined) ??
     approvers.find((a) => a.role === requiredRole)?.id ??

@@ -40,6 +40,9 @@ export function SubmitClaimForm({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Same manualId ?? defaultId derivation as TopBar/ActPanel (see TopBar's
+  // comment) — avoids seeding useState with a value that isn't known until
+  // localStorage resolves on the client.
   const defaultSubmitterId =
     stored && employees.some((e) => e.id === stored) ? stored : (employees[0]?.id ?? "");
   const submitterId = manualSubmitterId ?? defaultSubmitterId;
