@@ -31,6 +31,29 @@ describe("computeChain", () => {
   it("routes above RM2000 to Manager, Finance, Director", () => {
     expect(computeChain(2001)).toEqual(["Manager", "Finance", "Director"]);
   });
+
+  // Boundary Value Analysis on the RM500/RM2000 thresholds, at fractional
+  // amounts (not just round numbers) since `amount` is a Decimal — this is
+  // the exact edge where a rounding/comparison bug would hide.
+  describe("RM500 boundary", () => {
+    it("routes RM499.99 (just below) to Manager only", () => {
+      expect(computeChain(499.99)).toEqual(["Manager"]);
+    });
+
+    it("routes RM500.01 (just above) to Manager, Finance", () => {
+      expect(computeChain(500.01)).toEqual(["Manager", "Finance"]);
+    });
+  });
+
+  describe("RM2000 boundary", () => {
+    it("routes RM1999.99 (just below) to Manager, Finance", () => {
+      expect(computeChain(1999.99)).toEqual(["Manager", "Finance"]);
+    });
+
+    it("routes RM2000.01 (just above) to Manager, Finance, Director", () => {
+      expect(computeChain(2000.01)).toEqual(["Manager", "Finance", "Director"]);
+    });
+  });
 });
 
 describe("required scenarios", () => {

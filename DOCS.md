@@ -163,9 +163,10 @@ Prisma schema/migration, the `getClaimStatus`/`act`/`submitClaim`
 functions, the API routes, the UI components, and the test suite.
 
 What was verified, not just trusted:
-- All 7 required scenarios (plus 3 chain-boundary tests) run against a real
-  SQLite database via Vitest — not mocked — specifically because the
-  concurrency test (#7) only means something against a real DB constraint.
+- All 7 required scenarios (plus 7 computeChain tests, including boundary
+  values at the RM500/RM2000 thresholds) run against a real SQLite database
+  via Vitest — not mocked — specifically because the concurrency test (#7)
+  only means something against a real DB constraint.
 - The full submit → approve → reject → resubmit path was exercised against
   the actual running dev server and rendered HTML output, not just unit
   tests, to catch integration issues the unit tests wouldn't see (route
@@ -192,7 +193,9 @@ What was verified, not just trusted:
   oversight, and would need to be replaced before real users touched this.
 - **Before real users touched this**, the first things worth checking:
   concurrent-write behavior under real network latency (the test uses
-  `Promise.allSettled` in-process, not genuinely separate clients);
-  decimal/currency rounding at the edges of the RM500/RM2000 thresholds
-  with non-round amounts; and whether "any Manager can approve" is actually
-  the desired policy versus routing to a specific assigned approver.
+  `Promise.allSettled` in-process, not genuinely separate clients); and
+  whether "any Manager can approve" is actually the desired policy versus
+  routing to a specific assigned approver. (Decimal/currency rounding at the
+  RM500/RM2000 boundaries was an open risk here but is now covered by
+  boundary-value tests at RM499.99/500.01 and RM1999.99/2000.01 in
+  `claims.test.ts`.)
