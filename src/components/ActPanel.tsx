@@ -23,11 +23,6 @@ export function ActPanel({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState<"approved" | "rejected" | null>(null);
 
-  // Same live-default pattern as TopBar: recomputed every render (not
-  // useState(defaultId), which would go stale) so it reacts if the stored
-  // pick changes. Ordered to prefer an approver matching this stage's
-  // required role — a convenience only; act() re-checks the role server-side
-  // regardless of what's preselected here.
   const defaultId =
     (stored && approvers.some((a) => a.id === stored) ? stored : undefined) ??
     approvers.find((a) => a.role === requiredRole)?.id ??
